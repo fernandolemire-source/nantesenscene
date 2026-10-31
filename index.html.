@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nantes en Scène — Agenda culturel</title>
+<meta name="description" content="Découvrez les événements culturels à Nantes et dans sa métropole.">
+<style>
+:root {
+  --navy: #17243b;
+  --orange: #f07845;
+  --cream: #faf7f1;
+  --white: #fff;
+  --muted: #777;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: var(--cream);
+  color: var(--navy);
+}
+header {
+  background: var(--navy);
+  color: white;
+  padding: 22px 6%;
+}
+.logo {
+  font-family: Georgia, serif;
+  font-size: 29px;
+  font-weight: bold;
+}
+.logo span { color: var(--orange); }
+header p { margin: 7px 0 0; color: #d7dce5; }
+nav {
+  display: flex;
+  gap: 22px;
+  flex-wrap: wrap;
+  margin-top: 22px;
+}
+nav a {
+  color: white;
+  text-decoration: none;
+  font-size: 14px;
+}
+.hero {
+  padding: 65px 7%;
+  background: linear-gradient(120deg, #253b5a, #17243b);
+  color: white;
+}
+.hero small {
+  color: #ffad82;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+.hero h1 {
+  font: bold clamp(35px, 7vw, 58px) Georgia, serif;
+  max-width: 700px;
+  margin: 18px 0;
+}
+.hero p {
+  color: #e0e5ed;
+  line-height: 1.6;
+  max-width: 540px;
+}
+main { padding: 40px 6%; }
+.section-title {
+  font: bold 30px Georgia, serif;
+  margin-bottom: 8px;
+}
+.intro { color: var(--muted); margin-bottom: 25px; }
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 25px 0;
+}
+input, select {
+  padding: 13px;
+  border: 1px solid #ddd;
+  border-radius: 7px;
+  background: white;
+  font-size: 14px;
+  flex: 1;
+  min-width: 150px;
+}
+.categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-bottom: 28px;
+}
+.category {
+  border: 1px solid #ddd;
+  background: white;
+  padding: 10px 15px;
+  border-radius: 25px;
+  cursor: pointer;
+}
+.category.active {
+  background: var(--navy);
+  color: white;
+}
+.events {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+}
+.event {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 3px 15px #17243b12;
+}
+.event-top {
+  background: var(--navy);
+  color: white;
+  padding: 25px;
+  min-height: 110px;
+}
+.event-top span {
+  color: #ffad82;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+.event-content { padding: 20px; }
+.event h3 {
+  font: bold 22px Georgia, serif;
+  margin: 0 0 12px;
+}
+.event p {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.event a {
+  display: inline-block;
+  margin-top: 10px;
+  color: var(--orange);
+  font-weight: bold;
+  text-decoration: none;
+}
+.notice {
+  background: #fff0e8;
+  padding: 15px;
+  border-radius: 8px;
+  margin: 25px 0;
+  font-size: 13px;
+  color: #75452e;
+}
+footer {
+  background: var(--navy);
+  color: white;
+  text-align: center;
+  padding: 35px 15px;
+  margin-top: 45px;
+}
+footer p { color: #d7dce5; font-size: 13px; }
+@media(max-width:600px) {
+  .hero { padding: 48px 6%; }
+  main { padding: 30px 5%; }
+  nav { gap: 14px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Nantes <span>en Scène</span></div>
+  <p>La culture nantaise, en mouvement.</p>
+  <nav>
+    <a href="#agenda">Agenda</a>
+    <a href="#categories">Catégories</a>
+    <a href="#apropos">À propos</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <small>Votre rendez-vous culturel</small>
+  <h1>La culture se vit ici.</h1>
+  <p>
+    Concerts, spectacles, expositions, festivals et découvertes :
+    explorez toute la richesse culturelle de Nantes et de sa métropole.
+  </p>
+</section>
+
+<main id="agenda">
+  <h2 class="section-title">L'agenda culturel</h2>
+  <p class="intro">Trouvez votre prochaine sortie à Nantes.</p>
+
+  <div class="filters">
+    <input id="search" type="search"
+      placeholder="Rechercher un événement...">
+    <select id="categoryFilter">
+      <option value="">Toutes les catégories</option>
+      <option>Musique</option>
+      <option>Théâtre</option>
+      <option>Exposition</option>
+      <option>Festival</option>
+      <option>Danse</option>
+    </select>
+  </div>
+
+  <div class="notice">
+    Les événements affichés ci-dessous sont des exemples de présentation.
+    L'agenda sera alimenté avec de vrais événements dans une prochaine étape.
+  </div>
+
+  <div class="events" id="events"></div>
+</main>
+
+<section id="categories" style="padding:20px 6% 45px">
+  <h2 class="section-title">Explorer par univers</h2>
+  <div class="categories">
+    <button class="category active" data-category="">Tout voir</button>
+    <button class="category" data-category="Musique">Musique</button>
+    <button class="category" data-category="Théâtre">Théâtre</button>
+    <button class="category" data-category="Exposition">Expositions</button>
+    <button class="category" data-category="Festival">Festivals</button>
+    <button class="category" data-category="Danse">Danse</button>
+  </div>
+</section>
+
+<footer id="apropos">
+  <div class="logo">Nantes <span>en Scène</span></div>
+  <p>La culture nantaise, en mouvement.</p>
+  <p>Un agenda culturel dédié à Nantes et sa métropole.</p>
+</footer>
+
+<script>
+const events = [
+  {
+    title: "Soirée musicale",
+    category: "Musique",
+    date: "À venir",
+    place: "Nantes",
+    description: "Une soirée consacrée aux découvertes musicales."
+  },
+  {
+    title: "Scène ouverte",
+    category: "Théâtre",
+    date: "À venir",
+    place: "Nantes Métropole",
+    description: "Découvrez de nouveaux talents sur scène."
+  },
+  {
+    title: "Regards sur la ville",
+    category: "Exposition",
+    date: "À venir",
+    place: "Nantes",
+    description: "Une exposition autour de la création contemporaine."
+  },
+  {
+    title: "Rendez-vous culturel",
+    category: "Festival",
+    date: "À venir",
+    place: "Nantes Métropole",
+    description: "Un moment de rencontres et de découvertes."
+  },
+  {
+    title: "Mouvement et danse",
+    category: "Danse",
+    date: "À venir",
+    place: "Nantes",
+    description: "Une proposition artistique autour du mouvement."
+  }
+];
+
+let selectedCategory = "";
+
+function displayEvents() {
+  const search = document.getElementById("search").value.toLowerCase();
+  const category = selectedCategory ||
+    document.getElementById("categoryFilter").value;
+
+  const filtered = events.filter(event =>
+    (event.title.toLowerCase().includes(search) ||
+     event.place.toLowerCase().includes(search) ||
+     event.description.toLowerCase().includes(search)) &&
+    (!category || event.category === category)
+  );
+
+  document.getElementById("events").innerHTML = filtered.length
+    ? filtered.map(event => `
+      <article class="event">
+        <div class="event-top">
+          <span>${event.category}</span>
+          <p>${event.date}</p>
+        </div>
+        <div class="event-content">
+          <h3>${event.title}</h3>
+          <p>${event.description}</p>
+          <p>📍 ${event.place}</p>
+        </div>
+      </article>
+    `).join("")
+    : "<p>Aucun événement trouvé.</p>";
+}
+
+document.getElementById("search").addEventListener("input", displayEvents);
+document.getElementById("categoryFilter").addEventListener("change", () => {
+  selectedCategory = "";
+  document.querySelectorAll(".category").forEach(button =>
+    button.classList.toggle("active", button.dataset.category === "")
+  );
+  displayEvents();
+});
+
+document.querySelectorAll(".category").forEach(button => {
+  button.addEventListener("click", () => {
+    selectedCategory = button.dataset.category;
+    document.getElementById("categoryFilter").value = "";
+    document.querySelectorAll(".category").forEach(item =>
+      item.classList.toggle("active", item === button)
+    );
+    displayEvents();
+  });
+});
+
+displayEvents();
+</script>
+
+</body>
+</html>
