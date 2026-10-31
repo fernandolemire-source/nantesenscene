@@ -192,9 +192,11 @@ footer p { color: #d7dce5; font-size: 13px; }
 <main id="agenda">
   <h2 class="section-title">L'agenda culturel</h2>
   <p class="intro">Trouvez votre prochaine sortie à Nantes.</p>
+
   <div class="filters">
     <input id="search" type="search"
       placeholder="Rechercher un événement...">
+
     <select id="categoryFilter">
       <option value="">Toutes les catégories</option>
       <option>Musique</option>
@@ -203,9 +205,18 @@ footer p { color: #d7dce5; font-size: 13px; }
       <option>Festival</option>
       <option>Danse</option>
     </select>
+
     <input id="dateFilter" type="date"
       aria-label="Choisir une date">
   </div>
+
+  <div class="notice">
+    Les événements affichés ci-dessous sont des exemples de présentation.
+    L'agenda sera alimenté avec de vrais événements dans une prochaine étape.
+  </div>
+
+  <div class="events" id="events"></div>
+</main>
   <div class="notice">
     Les événements affichés ci-dessous sont des exemples de présentation.
     L'agenda sera alimenté avec de vrais événements dans une prochaine étape.
