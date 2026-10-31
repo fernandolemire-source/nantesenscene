@@ -391,7 +391,10 @@ async function loadEvents() {
       "<p>Le chargement des événements a échoué.</p>";
 
     console.error(error);
-    document.getElementById("search").addEventListener("input", displayEvents);
+  }
+}
+
+document.getElementById("search").addEventListener("input", displayEvents);
 
 document.getElementById("categoryFilter").addEventListener("change", () => {
   selectedCategory = "";
@@ -413,5 +416,7 @@ document.querySelectorAll(".category").forEach(button => {
 });
 
 loadEvents();
-</html>
+</script>
 
+</body>
+</html>
