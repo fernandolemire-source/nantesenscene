@@ -390,33 +390,4 @@ async function loadEvents() {
     eventsContainer.innerHTML =
       "<p>Le chargement des événements a échoué.</p>";
 
-    console.error(error);
-  }
-}
-
-document.getElementById("search").addEventListener("input", displayEvents);
-
-document.getElementById("categoryFilter").addEventListener("change", () => {
-  selectedCategory = "";
-  document.querySelectorAll(".category").forEach(button =>
-    button.classList.toggle("active", button.dataset.category === "")
-  );
-  displayEvents();
-});
-
-document.querySelectorAll(".category").forEach(button => {
-  button.addEventListener("click", () => {
-    selectedCategory = button.dataset.category;
-    document.getElementById("categoryFilter").value = "";
-    document.querySelectorAll(".category").forEach(item =>
-      item.classList.toggle("active", item === button)
-    );
-    displayEvents();
-  });
-});
-
-loadEvents();
-</script>
-
-</body>
-</html>
+    
