@@ -228,82 +228,198 @@ footer p { color: #d7dce5; font-size: 13px; }
 </footer>
 
 <script>
-const events = [
-  {
-    title: "Soirée musicale",
-    category: "Musique",
-    date: "À venir",
-    place: "Nantes",
-    description: "Une soirée consacrée aux découvertes musicales."
-  },
-  {
-    title: "Scène ouverte",
-    category: "Théâtre",
-    date: "À venir",
-    place: "Nantes Métropole",
-    description: "Découvrez de nouveaux talents sur scène."
-  },
-  {
-    title: "Regards sur la ville",
-    category: "Exposition",
-    date: "À venir",
-    place: "Nantes",
-    description: "Une exposition autour de la création contemporaine."
-  },
-  {
-    title: "Rendez-vous culturel",
-    category: "Festival",
-    date: "À venir",
-    place: "Nantes Métropole",
-    description: "Un moment de rencontres et de découvertes."
-  },
-  {
-    title: "Mouvement et danse",
-    category: "Danse",
-    date: "À venir",
-    place: "Nantes",
-    description: "Une proposition artistique autour du mouvement."
-  }
-];
-
+let events = [];
 let selectedCategory = "";
+
+const eventsContainer = document.getElementById("events");
+const notice = document.querySelector(".notice");
+
+function escapeHTML(value) {
+  return String(value || "").replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;"
+  })[char]);
+}
+
+function getCategory(record) {
+  const types = (record.types_libelles || []).join(" ").toLowerCase();
+
+  if (types.includes("festival")) return "Festival";
+  if (types.includes("théâtre") || types.includes("humour")) return "Théâtre";
+  if (types.includes("exposition") || types.includes("patrimoine")) return "Exposition";
+  if (types.includes("musique") || types.includes("concert")) return "Musique";
+  if (types.includes("danse")) return "Danse";
+
+  return null;
+}
+
+function formatDate(value) {
+  if (!value) return "Date à confirmer";
+
+  const date = new Date(value + "T00:00:00");
+
+  return date.toLocaleDateString("fr-FR", {
+    day: "numeric",
+    month: "long",
+    year: "numeric"
+  });
+}
 
 function displayEvents() {
   const search = document.getElementById("search").value.toLowerCase();
+
   const category = selectedCategory ||
     document.getElementById("categoryFilter").value;
 
   const filtered = events.filter(event =>
-    (event.title.toLowerCase().includes(search) ||
-     event.place.toLowerCase().includes(search) ||
-     event.description.toLowerCase().includes(search)) &&
+    (
+      event.title.toLowerCase().includes(search) ||
+      event.place.toLowerCase().includes(search) ||
+      event.description.toLowerCase().includes(search)
+    ) &&
     (!category || event.category === category)
   );
 
-  document.getElementById("events").innerHTML = filtered.length
-    ? filtered.map(event => `
-      <article class="event">
-        <div class="event-top">
-          <span>${event.category}</span>
-          <p>${event.date}</p>
-        </div>
-        <div class="event-content">
-          <h3>${event.title}</h3>
-          <p>${event.description}</p>
-          <p>📍 ${event.place}</p>
-        </div>
-      </article>
-    `).join("")
-    : "<p>Aucun événement trouvé.</p>";
+  if (!filtered.length) {
+    eventsContainer.innerHTML = "<p>Aucun événement trouvé.</p>";
+    return;
+  }
+
+  eventsContainer.innerHTML = filtered.map(event => `
+    <article class="event">
+      ${event.image ? `
+        <img src="${escapeHTML(event.image)}"
+             alt=""
+             style="width:100%;height:150px;object-fit:cover;display:block">
+      ` : ""}
+      <div class="event-top">
+        <span>${escapeHTML(event.category)}</span>
+        <p>${escapeHTML(event.date)}</p>
+      </div>
+      <div class="event-content">
+        <h3>${escapeHTML(event.title)}</h3>
+        <p>${escapeHTML(event.description)}</p>
+        <p>📍 ${escapeHTML(event.place)}</p>
+        ${event.time ? `<p>🕒 ${escapeHTML(event.time)}</p>` : ""}
+        <p>${event.price === "oui" ? "Gratuit" : "Tarif : voir le site"}</p>
+        ${event.link ? `
+          <a href="${escapeHTML(event.link)}"
+             target="_blank"
+             rel="noopener noreferrer">
+            Plus d'informations →
+          </a>
+        ` : ""}
+      </div>
+    </article>
+  `).join("");
+}
+
+async function loadEvents() {
+  notice.textContent = "Chargement des événements de Nantes Métropole...";
+
+  const now = new Date();
+  const today = [
+    now.getFullYear(),
+    String(now.getMonth() + 1).padStart(2, "0"),
+    String(now.getDate()).padStart(2, "0")
+  ].join("-");
+
+  const params = new URLSearchParams({
+    limit: "100",
+    where: `date >= date'${today}'`,
+    order_by: "date ASC"
+  });
+
+  const apiUrl =
+    "https://data.nantesmetropole.fr/api/explore/v2.1/catalog/datasets/244400404_agenda-evenements-nantes-metropole_v2/records?"
+    + params.toString();
+
+  try {
+    const response = await fetch(apiUrl);
+
+    if (!response.ok) {
+      throw new Error("Erreur de chargement");
+    }
+
+    const data = await response.json();
+
+    const seen = new Set();
+
+    events = (data.results || [])
+      .filter(record => record.annule !== "oui")
+      .map(record => {
+        const category = getCategory(record);
+
+        if (!category) return null;
+
+        const key = [
+          record.id_manif || record.id_agenda_in || record.nom,
+          record.date,
+          record.heure_debut || ""
+        ].join("-");
+
+        if (seen.has(key)) return null;
+        seen.add(key);
+
+        return {
+          title: record.nom || "Événement culturel",
+          category,
+          date: formatDate(record.date),
+          place: [record.lieu, record.ville].filter(Boolean).join(", ") || "Nantes Métropole",
+          description: record.description_evt || "Découvrez cet événement culturel à Nantes.",
+          time: record.heure_debut || "",
+          price: record.gratuit || "",
+          image: record.media_url || "",
+          link: record.url_site || record.lien_agenda || ""
+        };
+      })
+      .filter(Boolean);
+
+    notice.textContent =
+      "Agenda alimenté par les données ouvertes de Nantes Métropole.";
+
+    displayEvents();
+
+  } catch (error) {
+    notice.textContent =
+      "Impossible de charger l'agenda pour le moment. Réessayez plus tard.";
+
+    eventsContainer.innerHTML =
+      "<p>Le chargement des événements a échoué.</p>";
+
+    console.error(error);
+  }
 }
 
 document.getElementById("search").addEventListener("input", displayEvents);
+
 document.getElementById("categoryFilter").addEventListener("change", () => {
   selectedCategory = "";
+
   document.querySelectorAll(".category").forEach(button =>
     button.classList.toggle("active", button.dataset.category === "")
   );
+
   displayEvents();
+});
+
+document.querySelectorAll(".category").forEach(button => {
+  button.addEventListener("click", () => {
+    selectedCategory = button.dataset.category;
+    document.getElementById("categoryFilter").value = "";
+
+    document.querySelectorAll(".category").forEach(item =>
+      item.classList.toggle("active", item === button)
+    );
+
+    displayEvents();
+  });
+});
+
+loadEvents();
 });
 
 document.querySelectorAll(".category").forEach(button => {
